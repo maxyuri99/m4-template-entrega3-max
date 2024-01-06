@@ -2,7 +2,7 @@ interface Book {
     id: number;
     name: string;
     pages: number;
-    category?: string;
+    category: string;
     createdAt: Date;
     updatedAt: Date;
 }

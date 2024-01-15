@@ -1,5 +1,5 @@
 import { booksDatabase } from "../database/database";
-import { CreateBook, Book, UpdateBook } from "../interfaces/book.interfaces";
+import { CreateBook, Book, UpdateBook, BookArray } from "../interfaces/book.interfaces";
 import { idGenerate } from "../utils";
 
 export class BookServices {
@@ -16,7 +16,14 @@ export class BookServices {
         return newBook;
     };
 
-    getBook = () => {
+    getBook = (query: string): BookArray =>  {
+        if (query) {
+            const lowerCaseQuery = query.toLowerCase();
+            const bookFilter = booksDatabase.find((data) => data.name.toLowerCase().includes(lowerCaseQuery));
+            
+            return bookFilter ? [bookFilter] : [];
+        }
+
         return booksDatabase;
     };
 

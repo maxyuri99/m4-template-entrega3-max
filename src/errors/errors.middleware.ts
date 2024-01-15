@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { AppError } from "./AppError";
+import { ZodError } from "zod";
+import { RequestSchema } from "../interfaces/book.interfaces";
 
 export class GlobalErrors {
     handleErrors = (
@@ -12,8 +14,30 @@ export class GlobalErrors {
             return res.status(err.statusCode).json({ error: err.message });
         }
 
+        if (err instanceof ZodError) {
+            return res.status(409).json(err);
+        }
+
         console.log(err);
 
-        return res.status(500).json({ error: "Internal server error." })
+        return res.status(500).json({ error: "Internal server error." });
+    };
+
+    validateBody = (schemas: RequestSchema) => {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            if (schemas.params) {
+                req.params = await schemas.params.parseAsync(req.params);
+            }
+
+            if (schemas.body) {
+                req.body = await schemas.body.parseAsync(req.body);
+            }
+
+            if (schemas.query) {
+                req.query.name? req.query = await schemas.query.parseAsync(req.query) : (null);
+            }
+
+            return next();
+        }
     }
 }
